@@ -1,40 +1,44 @@
-//your JS code here. If required.
-// Function to create a promise with a 50% chance of resolving or rejecting
-function createPromise() {
-  return new Promise((resolve, reject) => {
-    const randomNumber = Math.floor(Math.random() * 10) + 1; // Random number between 1 and 10
+// Function to generate a random number between 1 and 10
+  function getRandomNumber() {
+    return Math.floor(Math.random() * 10) + 1;
+  }
 
-    // 50% chance of resolving with a number or rejecting with an error
-    if (Math.random() < 0.5) {
-      resolve(randomNumber);
-    } else {
-      reject(new Error(`Error for promise with random number ${randomNumber}`));
-    }
-  });
-}
-
-// Create an array of five promises
-const promises = Array.from({ length: 5 }, createPromise);
-
-// Use Promise.all to wait for all promises to settle
-Promise.allSettled(promises)
-  .then((results) => {
-    // Log the results or errors in the output div
-    const outputDiv = document.getElementById('output');
-
-    results.forEach((result, index) => {
-      const p = document.createElement('p');
-
-      if (result.status === 'fulfilled') {
-        p.innerText = `Promise ${index + 1} resolved with result: ${result.value}`;
-      } else {
-        p.innerText = `Promise ${index + 1} rejected with error: ${result.reason.message}`;
-      }
-
-      outputDiv.appendChild(p);
+  // Function to create a promise that resolves to a random number or rejects with an error
+  function createPromise() {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (Math.random() < 0.5) {
+          resolve(getRandomNumber());
+        } else {
+          reject(new Error('Promise rejected with error'));
+        }
+      }, 1000);
     });
-  })
-  .catch((error) => {
-    // Handle errors if Promise.allSettled fails
-    console.error(error);
-  });
+  }
+
+  // Create an array of 5 promises
+  const promises = [
+    createPromise(),
+    createPromise(),
+    createPromise(),
+    createPromise(),
+    createPromise()
+  ];
+
+  // Use Promise.all to wait for all promises to settle and log the results or errors
+  Promise.all(promises)
+    .then(results => {
+      results.forEach((result, index) => {
+        if (result instanceof Error) {
+          console.log(`Promise ${index + 1} rejected with error`);
+        } else {
+          const outputDiv = document.getElementById('output');
+          const p = document.createElement('p');
+          p.textContent = `Promise ${index + 1}: ${result}`;
+          outputDiv.appendChild(p);
+        }
+      });
+    })
+    .catch(error => {
+      console.log('Error:', error);
+    });
