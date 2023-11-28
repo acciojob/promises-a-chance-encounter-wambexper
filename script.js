@@ -1,37 +1,28 @@
-window.promises = [];
+const promises = [];
+for (let i = 1; i <= 5; i++) {
+  const p = new Promise((resolve, reject) => {
+    const randomNumber = Math.floor(Math.random() * 10) + 1;
+    setTimeout(() => {
+      if (Math.random() >= 0.5) {
+        resolve(randomNumber);
+      } else {
+        reject(`Promise ${i} rejected with error`);
+      }
+    }, 1000);
+  });
+  promises.push(p);
+}
 
-let divElement=document.getElementById("output");
-
-let prom1=new Promise((resolve,reject)=>{
-	setTimeout(()=>{
-		resolve("1st");
-	},1000);
-});
-let prom2=new Promise((resolve,reject)=>{
-	setTimeout(()=>{
-		resolve("2nd");
-	},2000);
-});
-let prom3=new Promise((resolve,reject)=>{
-	setTimeout(()=>{
-		resolve("3rd");
-	},3000);
-});
-let prom4=new Promise((resolve,reject)=>{
-	setTimeout(()=>{
-		resolve("4th");
-	},4000);
-});
-let prom5=new Promise((resolve,reject)=>{
-	setTimeout(()=>{
-		resolve("5th");
-	},5000);
-});
-// Do not change the code above this
-// add your promises to the array `promises`
-promises=[prom1,prom2,prom3,prom4,prom5];
-let proms=Promise.any(promises);
-proms.then((data)=>{
-	divElement.innerText=data;
-	// console.log(data);
-});
+Promise.all(promises)
+  .then((results) => {
+    results.forEach((result, index) => {
+      const p = document.createElement('p');
+      p.innerText = `Promise ${index + 1}: ${result}`;
+      document.getElementById('output').appendChild(p);
+    });
+  })
+  .catch((error) => {
+    const p = document.createElement('p');
+    p.innerText = error;
+    document.getElementById('output').appendChild(p);
+  });
