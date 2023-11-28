@@ -1,28 +1,39 @@
-const promises = [];
-for (let i = 1; i <= 5; i++) {
-  const p = new Promise((resolve, reject) => {
-    const randomNumber = Math.floor(Math.random() * 10) + 1;
-    setTimeout(() => {
-      if (Math.random() >= 0.5) {
-        resolve(randomNumber);
-      } else {
-        reject(`Promise ${i} rejected with error`);
-      }
-    }, 1000);
-  });
-  promises.push(p);
+// Function to generate a random number between 1 and 10
+function getRandomNumber() {
+    return Math.floor(Math.random() * 10) + 1;
 }
 
-Promise.all(promises)
-  .then((results) => {
-    results.forEach((result, index) => {
-      const p = document.createElement('p');
-      p.innerText = `Promise ${index + 1}: ${result}`;
-      document.getElementById('output').appendChild(p);
+// Function to simulate an asynchronous operation with a 50% chance of success or failure
+function simulateAsyncOperation() {
+    return new Promise((resolve, reject) => {
+        // Simulate a 50% chance of success or failure
+        const isSuccess = Math.random() > 0.5;
+
+        if (isSuccess) {
+            resolve(getRandomNumber());
+        } else {
+            reject(new Error("Random error occurred"));
+        }
     });
-  })
-  .catch((error) => {
-    const p = document.createElement('p');
-    p.innerText = error;
-    document.getElementById('output').appendChild(p);
-  });
+}
+
+// Create an array of 5 promises
+const promises = Array.from({ length: 5 }, (_, index) => simulateAsyncOperation().then(
+    result => ({ result }),
+    error => ({ error })
+));
+
+// Use Promise.all to wait for all promises to settle
+Promise.all(promises)
+    .then(results => {
+        // Log the results or errors
+        const outputDiv = document.getElementById('output');
+
+        results.forEach((result, index) => {
+            if (result.result) {
+                outputDiv.innerHTML += `<p>Promise ${index + 1} resolved with result: ${result.result}</p>`;
+            } else {
+                outputDiv.innerHTML += `<p>Promise ${index + 1} rejected with error: ${result.error.message}</p>`;
+            }
+        });
+    });
